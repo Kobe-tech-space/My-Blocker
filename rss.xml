@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My Blog</title>
+    <link>https://kobe-tech-space.github.io/My-Blocker</link>
+    <description>A blog about web development</description>
+    <atom:link href="https://kobe-tech-space.github.io/My-Blocker/rss.xml" rel="self" type="application/rss+xml"/>
+    
+    <item>
+      <title><![CDATA[用代码编织日常：我的技术博客开篇]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/person.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/person.html</guid>
+      <description><![CDATA[在不确定的世界里，代码是我可控的逻辑与诗意。]]></description>
+      <pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title><![CDATA[first]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/first.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/first.html</guid>
+      <description><![CDATA[]]></description>
+      <pubDate>Fri, 15 May 2026 13:07:57 GMT</pubDate>
+    </item>
+
+    <item>
+      <title><![CDATA[Hello World]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/hello-world.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/hello-world.html</guid>
+      <description><![CDATA[My first blog post — built with a lightweight static site generator.]]></description>
+      <pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title><![CDATA[new - 副本]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/new - 副本.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/new - 副本.html</guid>
+      <description><![CDATA[我第一次学习使用AI,并用他简单的做了一个个人博客]]></description>
+      <pubDate>Thu, 14 May 2026 16:00:00 GMT</pubDate>
+    </item>
+
+    <item>
+      <title><![CDATA[new]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/new.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/new.html</guid>
+      <description><![CDATA[我第一次学习使用AI,并用他简单的做了一个个人博客]]></description>
+      <pubDate>Thu, 14 May 2026 16:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
