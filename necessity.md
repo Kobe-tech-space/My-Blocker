@@ -8,8 +8,11 @@ npx serve build
 
 ## 上传github
 
-  git checkout main
-  npm run build
+ npm install
+
+ npm run build
+
+ git checkout main
 
   git checkout gh-pages
 
