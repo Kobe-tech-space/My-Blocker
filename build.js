@@ -22,6 +22,7 @@ function ensureDir(dir) {
 }
 
 function copyDir(src, dest) {
+  if (!fs.existsSync(src)) return;
   ensureDir(dest);
   const entries = fs.readdirSync(src, { withFileTypes: true });
   for (const entry of entries) {
@@ -62,18 +63,46 @@ function renderPage(baseData, contentHtml) {
   return render(loadTemplate('base.html'), data);
 }
 
+// --- Helpers ---
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function parseDate(raw) {
+  if (!raw) return new Date();
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
+function formatDate(raw) {
+  if (!raw) return 'Unknown date';
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? String(raw) : raw;
+}
+
+function slugify(text) {
+  return String(text).toLowerCase().trim()
+    .replace(/[\s]+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+}
+
 // --- Post Parsing ---
 function parsePost(filePath) {
   const raw = readFile(filePath);
   const { data, content } = matter(raw);
   const slug = data.slug || path.basename(filePath, '.md');
   const html = marked.parse(content);
+  const d = parseDate(data.date);
   return {
     slug,
     title: data.title || slug,
-    date: data.date ? new Date(data.date) : new Date(),
-    dateFormatted: data.date || 'Unknown date',
-    isoDate: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+    date: d,
+    dateFormatted: formatDate(data.date),
+    isoDate: d.toISOString(),
     tags: data.tags || [],
     description: data.description || '',
     body: html,
@@ -88,12 +117,11 @@ function getAllPosts() {
 }
 
 function tagsToHtml(tags) {
-  return tags.map(t => `<a href="/tags/${t}.html" class="tag">${t}</a>`).join('');
+  return tags.map(t => `<a href="/tags/${slugify(t)}.html" class="tag">${escapeHtml(t)}</a>`).join('');
 }
 
 // --- Post Detail Pages ---
 function generatePostPages(posts) {
-  const baseTmpl = loadTemplate('base.html');
   const postTmpl = loadTemplate('post.html');
 
   for (const post of posts) {
