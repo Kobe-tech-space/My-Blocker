@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build": "node build.js",
-    "clean": "node -e \"require('fs').rmSync('build',{recursive:true,force:true})\""
+    "clean": "node -e \"require('fs').rmSync('build',{recursive:true,force:true})\"",
+    "deploy": "node deploy.js"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
