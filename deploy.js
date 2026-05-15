@@ -10,6 +10,13 @@ function sh(cmd) {
   execSync(cmd, { stdio: 'inherit', cwd: __dirname });
 }
 
+// Safety: ensure on main branch with deps
+sh('git checkout main');
+if (!fs.existsSync(path.join(__dirname, 'node_modules'))) {
+  console.log('Installing dependencies...');
+  sh('npm install');
+}
+
 // Step 1: Build
 console.log('[1/3] Building...');
 sh('node build.js');
