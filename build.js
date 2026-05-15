@@ -62,4 +62,55 @@ function renderPage(baseData, contentHtml) {
   return render(loadTemplate('base.html'), data);
 }
 
+// --- Post Parsing ---
+function parsePost(filePath) {
+  const raw = readFile(filePath);
+  const { data, content } = matter(raw);
+  const slug = data.slug || path.basename(filePath, '.md');
+  const html = marked.parse(content);
+  return {
+    slug,
+    title: data.title || slug,
+    date: data.date ? new Date(data.date) : new Date(),
+    dateFormatted: data.date || 'Unknown date',
+    isoDate: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+    tags: data.tags || [],
+    description: data.description || '',
+    body: html,
+  };
+}
+
+function getAllPosts() {
+  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
+  return files
+    .map(f => parsePost(path.join(POSTS_DIR, f)))
+    .sort((a, b) => b.date - a.date);
+}
+
+function tagsToHtml(tags) {
+  return tags.map(t => `<a href="/tags/${t}.html" class="tag">${t}</a>`).join('');
+}
+
+// --- Post Detail Pages ---
+function generatePostPages(posts) {
+  const baseTmpl = loadTemplate('base.html');
+  const postTmpl = loadTemplate('post.html');
+
+  for (const post of posts) {
+    const tagsHtml = tagsToHtml(post.tags);
+    const postContent = render(postTmpl, { ...post, tags_html: tagsHtml });
+    const pageData = {
+      title: `${post.title} - ${SITE_TITLE}`,
+      description: post.description,
+      og_type: 'article',
+      og_url: `${SITE_URL}/posts/${post.slug}.html`,
+      canonical: `${SITE_URL}/posts/${post.slug}.html`,
+      base_path: '../',
+      theme: '',
+      extra_scripts: '',
+    };
+    writeFile(path.join(BUILD_DIR, 'posts', `${post.slug}.html`), renderPage(pageData, postContent));
+  }
+}
+
 console.log('Build script loaded. Run build() to start.');
