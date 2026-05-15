@@ -141,4 +141,58 @@ function generatePostPages(posts) {
   }
 }
 
+// --- Homepage ---
+function generateHomepage(posts) {
+  const listTmpl = loadTemplate('list.html');
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE) || 1;
+
+  for (let page = 1; page <= totalPages; page++) {
+    const start = (page - 1) * POSTS_PER_PAGE;
+    const pagePosts = posts.slice(start, start + POSTS_PER_PAGE);
+
+    const postsHtml = pagePosts.map(p => {
+      const tagsHtml = tagsToHtml(p.tags);
+      return `
+        <article class="post-card">
+          <h2><a href="posts/${p.slug}.html">${escapeHtml(p.title)}</a></h2>
+          <div class="meta">
+            <time datetime="${p.isoDate}">${p.dateFormatted}</time>
+            <div class="tags">${tagsHtml}</div>
+          </div>
+          <p class="excerpt">${escapeHtml(p.description)}</p>
+        </article>`;
+    }).join('\n');
+
+    let paginationHtml = '';
+    if (totalPages > 1) {
+      paginationHtml = '<nav class="pagination">';
+      if (page > 1) {
+        const prev = page === 2 ? 'index.html' : `page/${page - 1}.html`;
+        paginationHtml += `<a href="../${prev}">← Newer</a>`;
+      }
+      if (page < totalPages) {
+        paginationHtml += `<a href="../page/${page + 1}.html">Older →</a>`;
+      }
+      paginationHtml += '</nav>';
+    }
+
+    const listContent = render(listTmpl, { posts_html: postsHtml, pagination_html: paginationHtml });
+    const pageData = {
+      title: page === 1 ? SITE_TITLE : `${SITE_TITLE} - Page ${page}`,
+      description: SITE_DESCRIPTION,
+      og_type: 'website',
+      og_url: page === 1 ? SITE_URL : `${SITE_URL}/page/${page}.html`,
+      canonical: page === 1 ? SITE_URL : `${SITE_URL}/page/${page}.html`,
+      base_path: '',
+      theme: '',
+      extra_scripts: '',
+    };
+
+    const outPath = page === 1
+      ? path.join(BUILD_DIR, 'index.html')
+      : path.join(BUILD_DIR, 'page', `${page}.html`);
+    writeFile(outPath, renderPage(pageData, listContent));
+  }
+}
+
 console.log('Build script loaded. Run build() to start.');
