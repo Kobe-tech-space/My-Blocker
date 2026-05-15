@@ -286,4 +286,69 @@ function generatePages() {
   return pages;
 }
 
+// --- RSS ---
+function generateRSS(posts) {
+  const items = posts.slice(0, RSS_POST_COUNT).map(p => `
+    <item>
+      <title><![CDATA[${p.title}]]></title>
+      <link>${SITE_URL}/posts/${p.slug}.html</link>
+      <guid>${SITE_URL}/posts/${p.slug}.html</guid>
+      <description><![CDATA[${p.description}]]></description>
+      <pubDate>${new Date(p.date).toUTCString()}</pubDate>
+    </item>`).join('\n');
+
+  const rss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>${SITE_TITLE}</title>
+    <link>${SITE_URL}</link>
+    <description>${SITE_DESCRIPTION}</description>
+    <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
+    ${items}
+  </channel>
+</rss>`;
+
+  writeFile(path.join(BUILD_DIR, 'rss.xml'), rss);
+}
+
+// --- Sitemap ---
+function generateSitemap(posts, pages) {
+  const postUrls = posts.map(p =>
+    `  <url><loc>${SITE_URL}/posts/${p.slug}.html</loc><lastmod>${p.isoDate}</lastmod></url>`
+  ).join('\n');
+
+  const pageUrls = pages.map(p =>
+    `  <url><loc>${SITE_URL}/${p.slug}.html</loc></url>`
+  ).join('\n');
+
+  const tags = new Set();
+  posts.forEach(p => p.tags.forEach(t => tags.add(t)));
+  const tagUrls = [...tags].map(t =>
+    `  <url><loc>${SITE_URL}/tags/${slugify(t)}.html</loc></url>`
+  ).join('\n');
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${SITE_URL}</loc></url>
+  <url><loc>${SITE_URL}/tags/index.html</loc></url>
+${tagUrls}
+${postUrls}
+${pageUrls}
+</urlset>`;
+
+  writeFile(path.join(BUILD_DIR, 'sitemap.xml'), sitemap);
+}
+
+// --- Search Index ---
+function generateSearchIndex(posts) {
+  const index = posts.map(p => ({
+    title: p.title,
+    slug: p.slug,
+    tags: p.tags,
+    description: p.description,
+    date: p.dateFormatted,
+  }));
+  writeFile(path.join(BUILD_DIR, 'search-index.json'), JSON.stringify(index));
+}
+
 console.log('Build script loaded. Run build() to start.');
