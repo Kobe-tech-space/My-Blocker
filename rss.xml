@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My Blog</title>
+    <link>https://kobe-tech-space.github.io/My-Blocker</link>
+    <description>A blog about web development</description>
+    <atom:link href="https://kobe-tech-space.github.io/My-Blocker/rss.xml" rel="self" type="application/rss+xml"/>
+    
+    <item>
+      <title><![CDATA[personality]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/personality.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/personality.html</guid>
+      <description><![CDATA[]]></description>
+      <pubDate>Fri, 15 May 2026 05:56:06 GMT</pubDate>
+    </item>
+
+    <item>
+      <title><![CDATA[Hello World]]></title>
+      <link>https://kobe-tech-space.github.io/My-Blocker/posts/hello-world.html</link>
+      <guid>https://kobe-tech-space.github.io/My-Blocker/posts/hello-world.html</guid>
+      <description><![CDATA[My first blog post — built with a lightweight static site generator.]]></description>
+      <pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
