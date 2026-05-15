@@ -2,7 +2,8 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const TMP = path.join(__dirname, '.deploy-tmp');
+const os = require('os');
+const TMP = path.join(os.tmpdir(), 'blog-deploy-tmp');
 
 function sh(cmd) {
   console.log(`  > ${cmd}`);
