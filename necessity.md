@@ -26,3 +26,11 @@ npx serve build
   git push origin gh-pages --force
 
   git checkout -f main
+
+
+
+## 自动脚本
+
+start.bat
+
+npm run deploy(确保使用前main分支提交干净)
