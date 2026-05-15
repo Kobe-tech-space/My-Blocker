@@ -259,4 +259,31 @@ function generateTagPages(posts) {
   writeFile(path.join(BUILD_DIR, 'tags', 'index.html'), renderPage(pageData, tagListContent));
 }
 
+// --- Standalone Pages ---
+function generatePages() {
+  if (!fs.existsSync(PAGES_DIR)) return [];
+  const files = fs.readdirSync(PAGES_DIR).filter(f => f.endsWith('.md'));
+  const pages = [];
+
+  for (const file of files) {
+    const parsed = parsePost(path.join(PAGES_DIR, file));
+    const postTmpl = loadTemplate('post.html');
+    const tagsHtml = tagsToHtml(parsed.tags);
+    const postContent = render(postTmpl, { ...parsed, tags_html: tagsHtml });
+    const pageData = {
+      title: `${parsed.title} - ${SITE_TITLE}`,
+      description: parsed.description,
+      og_type: 'website',
+      og_url: `${SITE_URL}/${parsed.slug}.html`,
+      canonical: `${SITE_URL}/${parsed.slug}.html`,
+      base_path: '',
+      theme: '',
+      extra_scripts: '',
+    };
+    writeFile(path.join(BUILD_DIR, `${parsed.slug}.html`), renderPage(pageData, postContent));
+    pages.push(parsed);
+  }
+  return pages;
+}
+
 console.log('Build script loaded. Run build() to start.');
