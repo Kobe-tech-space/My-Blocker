@@ -16,8 +16,10 @@ npx serve build
 
 
   git checkout gh-pages
+
+  rm -rf node_modules 
   git rm -rf .
-  cp -r build/* .
+  xcopy /E /Y build\* .
   echo "" > .nojekyll
 
 
