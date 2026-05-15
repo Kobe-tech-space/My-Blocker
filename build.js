@@ -351,4 +351,46 @@ function generateSearchIndex(posts) {
   writeFile(path.join(BUILD_DIR, 'search-index.json'), JSON.stringify(index));
 }
 
-console.log('Build script loaded. Run build() to start.');
+// --- Main Build ---
+function build() {
+  console.log('Building site...');
+
+  // 1. Clear and copy
+  if (fs.existsSync(BUILD_DIR)) fs.rmSync(BUILD_DIR, { recursive: true });
+  ensureDir(BUILD_DIR);
+  copyDir(ASSETS_DIR, path.join(BUILD_DIR, 'assets'));
+
+  // 2. Parse all posts
+  const posts = getAllPosts();
+  console.log(`  Found ${posts.length} posts`);
+
+  // 3. Generate pages
+  generatePostPages(posts);
+  console.log('  Post pages generated');
+
+  generateHomepage(posts);
+  console.log('  Homepage generated');
+
+  generateTagPages(posts);
+  console.log('  Tag pages generated');
+
+  const pages = generatePages();
+  console.log(`  ${pages.length} standalone pages generated`);
+
+  // 4. Generate feeds
+  generateRSS(posts);
+  console.log('  RSS generated');
+
+  generateSitemap(posts, pages);
+  console.log('  Sitemap generated');
+
+  generateSearchIndex(posts);
+  console.log('  Search index generated');
+
+  console.log('Build complete! Output in build/');
+}
+
+// Run if called directly
+if (require.main === module) {
+  build();
+}
