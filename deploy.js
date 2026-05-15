@@ -2,56 +2,50 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+const TMP = path.join(__dirname, '.deploy-tmp');
+
 function sh(cmd) {
   console.log(`  > ${cmd}`);
-  const opts = { stdio: 'inherit', cwd: __dirname };
-  // Allow non-zero exit for some commands
-  return execSync(cmd, opts);
+  execSync(cmd, { stdio: 'inherit', cwd: __dirname });
 }
 
-// 1. Build
-console.log('[1/2] Building...');
+// Step 1: Build
+console.log('[1/3] Building...');
 sh('node build.js');
 
-// 2. Commit any uncommitted changes on main first
-try { sh('git add . && git commit -m "wip"'); } catch (e) {}
-try { sh('git push origin main'); } catch (e) {}
+// Step 2: Save build/ to temp before switching branches
+console.log('\n[2/3] Saving build output to temp...');
+fs.rmSync(TMP, { recursive: true, force: true });
+fs.cpSync(path.join(__dirname, 'build'), TMP, { recursive: true });
 
-// 3. Deploy to gh-pages
-console.log('\n[2/2] Deploying to gh-pages...');
+// Step 3: Deploy to gh-pages
+console.log('\n[3/3] Deploying to gh-pages...');
 
+// Switch to gh-pages
 try { sh('git checkout gh-pages'); }
-catch (e) {
-  // Create gh-pages branch if it doesn't exist
-  try { sh('git checkout --orphan gh-pages'); } catch (e2) {}
-}
+catch (e) { try { sh('git checkout --orphan gh-pages'); } catch (e2) {} }
 
-// Remove all tracked files
-try { sh('git rm -rf .'); } catch (e) {}
-
-// Remove leftover files, keeping .git and node_modules
-const keep = new Set(['.git', 'node_modules']);
-const entries = fs.readdirSync(__dirname);
-for (const name of entries) {
-  if (keep.has(name)) continue;
+// Clean working dir (keep .git only)
+for (const name of fs.readdirSync(__dirname)) {
+  if (name === '.git') continue;
   fs.rmSync(path.join(__dirname, name), { recursive: true, force: true });
 }
 
-// Copy build output to root
-const buildDir = path.join(__dirname, 'build');
-for (const name of fs.readdirSync(buildDir)) {
-  fs.cpSync(path.join(buildDir, name), path.join(__dirname, name), { recursive: true });
+// Restore build output from temp
+for (const name of fs.readdirSync(TMP)) {
+  fs.cpSync(path.join(TMP, name), path.join(__dirname, name), { recursive: true });
 }
+fs.rmSync(TMP, { recursive: true, force: true });
 
-// Create .nojekyll
+// .nojekyll
 fs.writeFileSync(path.join(__dirname, '.nojekyll'), '');
 
 // Commit and push
 sh('git add .');
-try { sh('git commit -m "deploy"'); } catch (e) { console.log('  (nothing to commit)'); }
+try { sh('git commit -m "deploy"'); } catch (e) {}
 sh('git push origin gh-pages --force');
 
-// Switch back
+// Back to main
 sh('git checkout main');
 
-console.log('\nDone! https://kobe-tech-space.github.io/My-Blocker/');
+console.log('\nDeployed! https://kobe-tech-space.github.io/My-Blocker/');
