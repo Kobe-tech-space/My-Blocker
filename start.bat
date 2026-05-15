@@ -17,6 +17,6 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo Starting server at http://localhost:3000
+echo Starting server...
 start http://localhost:3000
-npx serve build
+npx serve build -l 3000
