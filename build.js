@@ -195,4 +195,68 @@ function generateHomepage(posts) {
   }
 }
 
+// --- Tag Pages ---
+function generateTagPages(posts) {
+  const listTmpl = loadTemplate('list.html');
+  const tagMap = {};
+
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      if (!tagMap[tag]) tagMap[tag] = [];
+      tagMap[tag].push(post);
+    }
+  }
+
+  // Individual tag pages
+  for (const [tag, tagPosts] of Object.entries(tagMap)) {
+    const tagSlug = slugify(tag);
+    const postsHtml = tagPosts.map(p => {
+      const tagsHtml = tagsToHtml(p.tags);
+      return `
+        <article class="post-card">
+          <h2><a href="../posts/${p.slug}.html">${escapeHtml(p.title)}</a></h2>
+          <div class="meta">
+            <time datetime="${p.isoDate}">${p.dateFormatted}</time>
+            <div class="tags">${tagsHtml}</div>
+          </div>
+          <p class="excerpt">${escapeHtml(p.description)}</p>
+        </article>`;
+    }).join('\n');
+
+    const listContent = render(listTmpl, { posts_html: postsHtml, pagination_html: '' });
+    const pageData = {
+      title: `Tag: ${escapeHtml(tag)} - ${SITE_TITLE}`,
+      description: `${tagPosts.length} articles tagged "${escapeHtml(tag)}"`,
+      og_type: 'website',
+      og_url: `${SITE_URL}/tags/${tagSlug}.html`,
+      canonical: `${SITE_URL}/tags/${tagSlug}.html`,
+      base_path: '../',
+      theme: '',
+      extra_scripts: '',
+    };
+    writeFile(path.join(BUILD_DIR, 'tags', `${tagSlug}.html`), renderPage(pageData, listContent));
+  }
+
+  // Tag overview page
+  const tagListTmpl = loadTemplate('tag-list.html');
+  const tagsHtml = Object.entries(tagMap)
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([tag, tagPosts]) =>
+      `<li><a href="${slugify(tag)}.html">${escapeHtml(tag)}</a> <span class="count">(${tagPosts.length})</span></li>`
+    ).join('\n');
+
+  const tagListContent = render(tagListTmpl, { tags_html: tagsHtml });
+  const pageData = {
+    title: `Tags - ${SITE_TITLE}`,
+    description: 'Browse articles by tag',
+    og_type: 'website',
+    og_url: `${SITE_URL}/tags/index.html`,
+    canonical: `${SITE_URL}/tags/index.html`,
+    base_path: '../',
+    theme: '',
+    extra_scripts: '',
+  };
+  writeFile(path.join(BUILD_DIR, 'tags', 'index.html'), renderPage(pageData, tagListContent));
+}
+
 console.log('Build script loaded. Run build() to start.');
