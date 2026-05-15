@@ -59,7 +59,7 @@ function render(template, data) {
 }
 
 function renderPage(baseData, contentHtml) {
-  const data = { ...baseData, content: contentHtml };
+  const data = { ...baseData, content: contentHtml, site_title: SITE_TITLE };
   return render(loadTemplate('base.html'), data);
 }
 
